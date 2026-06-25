@@ -1,0 +1,2 @@
+# This tells GitHub Pages to skip Jekyll processing and serve static files directly.
+# Without this file, Pages tries to build with Jekyll and may fail on plain HTML projects.
