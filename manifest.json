@@ -2,7 +2,7 @@
   "name": "央国企求职追踪",
   "short_name": "求职追踪",
   "description": "物流管理专业央国企秋招投递进度追踪工具",
-  "start_url": ".",
+  "start_url": "/job-tracker/",
   "display": "standalone",
   "background_color": "#f0f4f8",
   "theme_color": "#1a56db",

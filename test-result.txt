@@ -232,7 +232,6 @@
       padding: 1px 6px; border-radius: 6px; margin-left: 6px;
     }
   </style>
-  <link rel="apple-touch-icon" href="icon-192.png">
 </head>
 <body>
 
@@ -808,20 +807,8 @@ if (window.matchMedia('(display-mode: standalone)').matches) {
 
 // ===== SERVICE WORKER =====
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js', { scope: '/job-tracker/' }).catch(() => {});
+  navigator.serviceWorker.register('sw.js').catch(() => {});
 }
-
-// 捕获 beforeinstallprompt 事件，触发原生安装弹窗
-let deferredPrompt;
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-  console.log('📲 PWA 可安装');
-});
-window.addEventListener('appinstalled', () => {
-  deferredPrompt = null;
-  console.log('✅ PWA 已安装');
-});
 
 // ===== INIT =====
 renderAll();
