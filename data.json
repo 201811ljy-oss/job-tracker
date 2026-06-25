@@ -1,6 +1,6 @@
 {
   "v": 1,
-  "t": "2026-06-25T10:15:23.044Z",
+  "t": "2026-06-25T10:15:50.139Z",
   "data": {
     "zt1": {
       "status": "未投递",
@@ -372,7 +372,24 @@
       "applyChannel": "",
       "applyUrl": "",
       "notes": ""
+    },
+    "custom_1782380496484": {
+      "status": "未投递",
+      "applyDate": "",
+      "applyChannel": "",
+      "applyUrl": "",
+      "notes": ""
     }
   },
-  "custom": []
+  "custom": [
+    {
+      "id": "custom_1782380496484",
+      "name": "京东",
+      "tier": "tier4",
+      "custom": true,
+      "positions": "物流",
+      "location": "未填写",
+      "salary": ""
+    }
+  ]
 }
