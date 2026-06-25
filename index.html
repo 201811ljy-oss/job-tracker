@@ -231,6 +231,57 @@
       font-size: 9px; background: #fef3c7; color: #92400e;
       padding: 1px 6px; border-radius: 6px; margin-left: 6px;
     }
+
+    /* Sync status */
+    .sync-wrap {
+      display: flex; align-items: center; gap: 8px;
+    }
+    .sync-status {
+      font-size: 11px; padding: 3px 10px; border-radius: 12px;
+      cursor: pointer; white-space: nowrap;
+      transition: background .2s;
+    }
+    .sync-status.synced { background: #d1fae5; color: #065f46; }
+    .sync-status.syncing { background: #fef3c7; color: #92400e; animation: pulse 1.5s infinite; }
+    .sync-status.offline { background: #fee2e2; color: #991b1b; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .6; } }
+
+    .settings-btn {
+      width: 30px; height: 30px; border-radius: 50%;
+      border: 1px solid var(--border); background: var(--card);
+      font-size: 16px; cursor: pointer; display: flex;
+      align-items: center; justify-content: center;
+    }
+    .settings-btn:active { background: var(--bg); }
+
+    /* Settings modal */
+    .settings-overlay {
+      display: none; position: fixed; inset: 0; z-index: 400;
+      background: rgba(0,0,0,.4); align-items: center; justify-content: center;
+    }
+    .settings-overlay.show { display: flex; }
+    .settings-card {
+      background: var(--card); border-radius: var(--radius);
+      padding: 24px; width: 92%; max-width: 380px;
+      box-shadow: 0 8px 32px rgba(0,0,0,.12);
+    }
+    .settings-card h3 { font-size: 16px; margin-bottom: 8px; }
+    .settings-card .hint {
+      font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;
+    }
+    .settings-input {
+      width: 100%; padding: 10px 12px; border: 1px solid var(--border);
+      border-radius: var(--radius-sm); font-size: 13px; margin-bottom: 8px;
+    }
+    .settings-card .help {
+      font-size: 11px; color: var(--text-secondary); margin-bottom: 16px;
+    }
+    .settings-card .help a { color: var(--primary); }
+    .settings-ok {
+      width: 100%; padding: 10px; background: var(--primary);
+      color: #fff; border: none; border-radius: var(--radius-sm);
+      font-size: 14px; cursor: pointer;
+    }
   </style>
   <link rel="apple-touch-icon" href="icon-192.png">
 </head>
@@ -243,7 +294,10 @@
       <h1>📋 央国企求职追踪</h1>
       <div class="header-sub">物流管理 · 河北地质大学 · 2027届</div>
     </div>
-    <div style="font-size:24px;opacity:.7">🏢</div>
+    <div class="sync-wrap">
+      <span class="sync-status offline" id="syncStatus" onclick="showSettings()">☁️ 未连接</span>
+      <button class="settings-btn" onclick="showSettings()" title="同步设置">⚙️</button>
+    </div>
   </div>
 </div>
 
@@ -307,6 +361,22 @@
 
 <!-- Toast -->
 <div class="toast" id="toast"></div>
+
+<!-- Settings modal -->
+<div class="settings-overlay" id="settingsOverlay" onclick="if(event.target===this)hideSettings()">
+  <div class="settings-card">
+    <h3>☁️ 同步设置</h3>
+    <p class="hint">配置 GitHub Token 后，多设备数据自动同步</p>
+    <input class="settings-input" type="password" id="tokenInput" placeholder="ghp_... 粘贴你的 GitHub Token">
+    <p class="help">
+      需<b> classic token</b>，勾选 repo 权限。<br>
+      <a href="https://github.com/settings/tokens" target="_blank">→ 生成 Token</a>
+    </p>
+    <div class="help" id="settingsNote" style="margin-bottom:12px"></div>
+    <button class="settings-ok" onclick="saveToken()">💾 保存并同步</button>
+    <button class="settings-ok" style="background:#e2e8f0;color:#1a202c;margin-top:8px;" id="btnForceSync" onclick="forceSync()">🔄 立即同步</button>
+  </div>
+</div>
 
 <script>
 // ===== DATA =====
@@ -811,20 +881,235 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js', { scope: '/job-tracker/' }).catch(() => {});
 }
 
-// 捕获 beforeinstallprompt 事件，触发原生安装弹窗
-let deferredPrompt;
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-  console.log('📲 PWA 可安装');
-});
-window.addEventListener('appinstalled', () => {
-  deferredPrompt = null;
-  console.log('✅ PWA 已安装');
-});
+// ===== CLOUD SYNC =====
+const SYNC = {
+  owner: '201811ljy-oss',
+  repo: 'job-tracker',
+  path: 'data.json'
+};
+
+function getToken() {
+  return localStorage.getItem('job-tracker-sync-token') || '';
+}
+
+function setTokenUI(t) {
+  if (t) {
+    localStorage.setItem('job-tracker-sync-token', t);
+    document.getElementById('tokenInput').value = t;
+    document.getElementById('settingsNote').textContent = '✅ Token 已保存';
+    setSyncStatus('offline', '☁️ 点击同步');
+  } else {
+    localStorage.removeItem('job-tracker-sync-token');
+    document.getElementById('tokenInput').value = '';
+    document.getElementById('settingsNote').textContent = '';
+    setSyncStatus('offline', '☁️ 未连接');
+  }
+}
+
+function setSyncStatus(cls, text) {
+  const el = document.getElementById('syncStatus');
+  el.className = 'sync-status ' + cls;
+  el.textContent = text;
+}
+
+function showSettings() {
+  const el = document.getElementById('settingsOverlay');
+  el.classList.add('show');
+  document.getElementById('tokenInput').value = getToken();
+  document.getElementById('settingsNote').textContent = getToken() ? '✅ Token 已保存' : '';
+}
+
+function hideSettings() {
+  document.getElementById('settingsOverlay').classList.remove('show');
+}
+
+function saveToken() {
+  const t = document.getElementById('tokenInput').value.trim();
+  if (!t) { showToast('请输入 Token'); return; }
+  setTokenUI(t);
+  hideSettings();
+  showToast('Token 已保存，正在同步...');
+  doSync();
+}
+
+// 加载云端数据
+async function loadCloud() {
+  const url = `https://raw.githubusercontent.com/${SYNC.owner}/${SYNC.repo}/main/${SYNC.path}?t=${Date.now()}`;
+  const res = await fetch(url);
+  if (!res.ok) return null;
+  return await res.json();
+}
+
+// 推送云端
+async function pushCloud(cloudData) {
+  const token = getToken();
+  if (!token) return false;
+  const apiUrl = `https://api.github.com/repos/${SYNC.owner}/${SYNC.repo}/contents/${SYNC.path}`;
+
+  // 获取当前文件 SHA
+  let sha = null;
+  try {
+    const res = await fetch(apiUrl);
+    if (res.ok) { const fi = await res.json(); sha = fi.sha; }
+  } catch(e) {}
+
+  const json = JSON.stringify(cloudData, null, 2);
+  const body = {
+    message: '📊 同步求职数据 ' + new Date().toISOString().slice(0, 16).replace('T', ' '),
+    content: btoa(unescape(encodeURIComponent(json))),
+    branch: 'main'
+  };
+  if (sha) body.sha = sha;
+
+  const res = await fetch(apiUrl, {
+    method: 'PUT',
+    headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  return res.ok;
+}
+
+// 构建云端数据结构
+function buildCloudPayload() {
+  return {
+    v: 1,
+    t: new Date().toISOString(),
+    data: JSON.parse(localStorage.getItem('job-tracker-data') || '{}'),
+    custom: JSON.parse(localStorage.getItem('job-tracker-custom') || '[]')
+  };
+}
+
+// 合并策略：按每个企业的最新更新时间决定
+function mergeCloudIntoLocal(cloud) {
+  if (!cloud || !cloud.data) return;
+
+  const localData = JSON.parse(localStorage.getItem('job-tracker-data') || '{}');
+  const localCustom = JSON.parse(localStorage.getItem('job-tracker-custom') || '[]');
+
+  // 合并追踪数据（云端每企业按 _t 时间戳优先）
+  const merged = { ...localData };
+  Object.keys(cloud.data).forEach(id => {
+    const cd = cloud.data[id];
+    const ld = localData[id];
+    if (!ld || (cd._t && (!ld._t || cd._t > ld._t))) {
+      merged[id] = cd;
+    }
+  });
+  localStorage.setItem('job-tracker-data', JSON.stringify(merged));
+
+  // 合并自定义企业（按 id 去重，取并集）
+  const mergedCustom = [...localCustom];
+  (cloud.custom || []).forEach(cc => {
+    if (!mergedCustom.find(c => c.id === cc.id)) {
+      mergedCustom.push(cc);
+    }
+  });
+  localStorage.setItem('job-tracker-custom', JSON.stringify(mergedCustom));
+}
+
+// 主同步流程
+async function doSync() {
+  if (!getToken()) { setSyncStatus('offline', '☁️ 未连接'); return; }
+  setSyncStatus('syncing', '🔄 同步中...');
+  try {
+    const cloud = await loadCloud();
+    if (cloud && cloud.data) {
+      // 云端有数据，合入本地
+      mergeCloudIntoLocal(cloud);
+      // 如果本地也有更新，推回云端
+      const localPayload = buildCloudPayload();
+      if (cloud.t && localPayload.t > cloud.t) {
+        // 本地更新
+      }
+      // 始终推送（本地可能是和云端相同的合并结果，也可能是更新的）
+      const ok = await pushCloud(localPayload);
+      setSyncStatus(ok ? 'synced' : 'offline', ok ? '✅ 已同步' : '⚠️ 推送失败');
+      if (ok) {
+        console.log('☁️ 同步成功');
+      }
+    } else {
+      // 云端无数据，推送本地
+      const payload = buildCloudPayload();
+      const ok = await pushCloud(payload);
+      setSyncStatus(ok ? 'synced' : 'offline', ok ? '✅ 已同步' : '⚠️ 推送失败');
+    }
+    // 重新渲染以显示合并后的数据
+    renderAll();
+  } catch(e) {
+    setSyncStatus('offline', '⚠️ 网络错误');
+    console.error('Sync error:', e);
+  }
+}
+
+// 主动同步（用户手动点）
+async function forceSync() {
+  hideSettings();
+  showToast('正在同步...');
+  await doSync();
+  showToast('同步完成');
+}
+
+// 本地保存时自动触发（带防抖）
+let syncTimer = null;
+function scheduleSync() {
+  if (!getToken()) return;
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(() => doSync(), 1500);
+}
+
+// 拦截原生 saveData 和 saveCustomCompanies，加时间戳并触发同步
+const _origSaveData = saveData;
+const _origSaveCustom = saveCustomCompanies;
+const _origGetData = getData;
+
+saveData = function(data) {
+  // 对比旧数据，只为有变化的条目更新时间戳
+  const old = _origGetData();
+  for (const id in data) {
+    const d = data[id];
+    if (typeof d === 'object' && d !== null) {
+      const oldEntry = old[id];
+      if (!oldEntry || d.status !== oldEntry.status || d.applyDate !== oldEntry.applyDate ||
+          d.applyChannel !== oldEntry.applyChannel || d.notes !== oldEntry.notes) {
+        d._t = Date.now();
+      } else {
+        d._t = oldEntry._t || Date.now();
+      }
+    }
+  }
+  _origSaveData(data);
+  scheduleSync();
+};
+
+saveCustomCompanies = function(list) {
+  _origSaveCustom(list);
+  scheduleSync();
+};
 
 // ===== INIT =====
-renderAll();
+// 启动时自动拉取云端数据
+(async function initSync() {
+  if (getToken()) {
+    setSyncStatus('syncing', '🔄 加载中...');
+    try {
+      const cloud = await loadCloud();
+      if (cloud && cloud.data) {
+        mergeCloudIntoLocal(cloud);
+        setSyncStatus('synced', '✅ 已同步');
+      } else {
+        // 云端无数据，推送本地
+        const payload = buildCloudPayload();
+        await pushCloud(payload);
+        setSyncStatus('synced', '✅ 已同步');
+      }
+    } catch(e) {
+      setSyncStatus('offline', '⚠️ 网络错误');
+    }
+  } else {
+    setSyncStatus('offline', '☁️ 未连接');
+  }
+  renderAll();
+})();
 </script>
 </body>
 </html>
