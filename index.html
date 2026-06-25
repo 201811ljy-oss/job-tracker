@@ -807,11 +807,11 @@ function deleteCompany(companyId) {
 }
 
 // ===== UTILS =====
-function showToast(msg) {
+function showToast(msg, dur) {
   const el = document.getElementById('toast');
   el.textContent = msg;
   el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 2000);
+  setTimeout(() => el.classList.remove('show'), dur || 2000);
 }
 
 function exportCSV() {
@@ -878,7 +878,19 @@ if (window.matchMedia('(display-mode: standalone)').matches) {
 
 // ===== SERVICE WORKER =====
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js', { scope: '/job-tracker/' }).catch(() => {});
+  navigator.serviceWorker.register('sw.js?v=3', { scope: '/job-tracker/' })
+    .then(function(reg) {
+      // 检测 SW 更新，提示用户刷新
+      reg.addEventListener('updatefound', function() {
+        var newWorker = reg.installing;
+        newWorker.addEventListener('statechange', function() {
+          if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+            showToast('🔔 有新版本！请刷新页面以更新', 5000);
+          }
+        });
+      });
+    })
+    .catch(() => {});
 }
 
 // ===== CLOUD SYNC =====
@@ -971,40 +983,66 @@ async function pushCloud(cloudData) {
 
 // 构建云端数据结构
 function buildCloudPayload() {
+  const rawData = JSON.parse(localStorage.getItem('job-tracker-data') || '{}');
+  const now = Date.now();
+  // 确保所有数据条目标記时间戳
+  for (const id in rawData) {
+    if (typeof rawData[id] === 'object' && !rawData[id]._t) {
+      rawData[id]._t = now;
+    }
+  }
   return {
-    v: 1,
-    t: new Date().toISOString(),
-    data: JSON.parse(localStorage.getItem('job-tracker-data') || '{}'),
+    v: 2,
+    t: now,
+    data: rawData,
     custom: JSON.parse(localStorage.getItem('job-tracker-custom') || '[]')
   };
 }
 
-// 合并策略：按每个企业的最新更新时间决定
+// 合并策略：按每个企业的最新时间戳决定，没有时间戳的保留较有价值的一方
 function mergeCloudIntoLocal(cloud) {
   if (!cloud || !cloud.data) return;
 
   const localData = JSON.parse(localStorage.getItem('job-tracker-data') || '{}');
   const localCustom = JSON.parse(localStorage.getItem('job-tracker-custom') || '[]');
+  let changed = false;
 
-  // 合并追踪数据（云端每企业按 _t 时间戳优先）
+  // 合并追踪数据
   const merged = { ...localData };
   Object.keys(cloud.data).forEach(id => {
     const cd = cloud.data[id];
     const ld = localData[id];
-    if (!ld || (cd._t && (!ld._t || cd._t > ld._t))) {
+    if (!ld) {
+      // 本地没有，直接用云端
       merged[id] = cd;
+      changed = true;
+    } else if (cd._t && (!ld._t || cd._t > ld._t)) {
+      // 云端更新时间更新，用云端
+      merged[id] = cd;
+      changed = true;
+    } else if (!cd._t && !ld._t) {
+      // 都没有时间戳，取数据更丰富的一方
+      const cdLen = (cd.status !== '未投递' ? 1 : 0) + (cd.notes ? cd.notes.length : 0);
+      const ldLen = (ld.status !== '未投递' ? 1 : 0) + (ld.notes ? ld.notes.length : 0);
+      if (cdLen > ldLen) { merged[id] = cd; changed = true; }
     }
   });
-  localStorage.setItem('job-tracker-data', JSON.stringify(merged));
+  if (changed) {
+    localStorage.setItem('job-tracker-data', JSON.stringify(merged));
+  }
 
   // 合并自定义企业（按 id 去重，取并集）
+  let customChanged = false;
   const mergedCustom = [...localCustom];
   (cloud.custom || []).forEach(cc => {
     if (!mergedCustom.find(c => c.id === cc.id)) {
       mergedCustom.push(cc);
+      customChanged = true;
     }
   });
-  localStorage.setItem('job-tracker-custom', JSON.stringify(mergedCustom));
+  if (customChanged) {
+    localStorage.setItem('job-tracker-custom', JSON.stringify(mergedCustom));
+  }
 }
 
 // 主同步流程
