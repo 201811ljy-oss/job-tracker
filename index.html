@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#1a56db">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="求职追踪">
+  <title>央国企求职追踪</title>
+  <link rel="manifest" href="manifest.json">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f0f4f8;
+      --card: #ffffff;
+      --text: #1a202c;
+      --text-secondary: #64748b;
+      --border: #e2e8f0;
+      --primary: #1a56db;
+      --primary-light: #dbeafe;
+      --success: #059669;
+      --success-light: #d1fae5;
+      --warning: #d97706;
+      --warning-light: #fef3c7;
+      --danger: #dc2626;
+      --danger-light: #fee2e2;
+      --tier1: #2563eb;
+      --tier2: #7c3aed;
+      --tier3: #059669;
+      --tier4: #d97706;
+      --shadow: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
+      --shadow-lg: 0 4px 12px rgba(0,0,0,.1);
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      padding-bottom: 80px;
+    }
+
+    /* Header */
+    .header {
+      position: sticky; top: 0; z-index: 100;
+      background: linear-gradient(135deg, #1e3a5f 0%, #1a56db 100%);
+      color: #fff;
+      padding: 16px 20px;
+      box-shadow: 0 2px 10px rgba(26,86,219,.25);
+    }
+    .header-top { display: flex; align-items: center; justify-content: space-between; }
+    .header h1 { font-size: 20px; font-weight: 700; letter-spacing: -.3px; }
+    .header-sub { font-size: 13px; opacity: .85; margin-top: 2px; }
+
+    /* Stats row */
+    .stats { display: flex; gap: 8px; padding: 16px 16px 0; overflow-x: auto; }
+    .stat-card {
+      flex: 0 0 auto; min-width: 72px;
+      background: var(--card); border-radius: var(--radius-sm);
+      padding: 12px 14px; text-align: center;
+      box-shadow: var(--shadow);
+    }
+    .stat-card .num { font-size: 24px; font-weight: 700; line-height: 1; }
+    .stat-card .label { font-size: 11px; color: var(--text-secondary); margin-top: 4px; }
+    .stat-card.total .num { color: var(--primary); }
+    .stat-card.applied .num { color: var(--warning); }
+    .stat-card.interview .num { color: var(--tier2); }
+    .stat-card.offer .num { color: var(--success); }
+
+    /* Filters */
+    .filters { padding: 12px 16px; display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
+    .filters::-webkit-scrollbar { display: none; }
+    .filter-btn {
+      flex: 0 0 auto; padding: 6px 14px; border-radius: 20px;
+      border: 1.5px solid var(--border); background: var(--card);
+      font-size: 13px; cursor: pointer; white-space: nowrap;
+      transition: all .15s; color: var(--text-secondary);
+    }
+    .filter-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+    .search-bar { padding: 0 16px 12px; }
+    .search-input {
+      width: 100%; padding: 10px 16px; border-radius: 24px;
+      border: 1.5px solid var(--border); background: var(--card);
+      font-size: 14px; outline: none; transition: border .15s;
+    }
+    .search-input:focus { border-color: var(--primary); }
+
+    /* Company list */
+    .list { padding: 0 16px; }
+    .company-card {
+      background: var(--card); border-radius: var(--radius);
+      padding: 14px 16px; margin-bottom: 10px;
+      box-shadow: var(--shadow); cursor: pointer;
+      transition: all .15s; border-left: 4px solid transparent;
+      position: relative;
+    }
+    .company-card:active { transform: scale(.985); }
+    .company-card.tier1 { border-left-color: var(--tier1); }
+    .company-card.tier2 { border-left-color: var(--tier2); }
+    .company-card.tier3 { border-left-color: var(--tier3); }
+    .company-card.tier4 { border-left-color: var(--tier4); }
+
+    .card-top { display: flex; justify-content: space-between; align-items: flex-start; }
+    .card-name { font-size: 15px; font-weight: 600; line-height: 1.3; }
+    .card-tier {
+      font-size: 10px; padding: 2px 8px; border-radius: 10px;
+      font-weight: 500; white-space: nowrap;
+    }
+    .card-tier.t1 { background: #dbeafe; color: #1e40af; }
+    .card-tier.t2 { background: #ede9fe; color: #6d28d9; }
+    .card-tier.t3 { background: #d1fae5; color: #065f46; }
+    .card-tier.t4 { background: #fef3c7; color: #92400e; }
+
+    .card-info { margin-top: 6px; font-size: 12px; color: var(--text-secondary); }
+    .card-info span { margin-right: 12px; }
+
+    .card-bottom { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+    .status-badge {
+      font-size: 11px; padding: 3px 10px; border-radius: 10px; font-weight: 600;
+    }
+    .status-未投递 { background: #f1f5f9; color: #64748b; }
+    .status-已投递 { background: #fef3c7; color: #92400e; }
+    .status-测评中 { background: #e0e7ff; color: #3730a3; }
+    .status-笔试 { background: #dbeafe; color: #1e40af; }
+    .status-面试 { background: #ede9fe; color: #6d28d9; }
+    .status-已录用 { background: #d1fae5; color: #065f46; }
+    .status-已拒绝 { background: #fee2e2; color: #991b1b; }
+    .status-放弃 { background: #f1f5f9; color: #94a3b8; }
+
+    .card-date { font-size: 11px; color: var(--text-secondary); }
+
+    /* Bottom nav */
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: var(--card); border-top: 1px solid var(--border);
+      display: flex; padding: 6px 0 env(safe-area-inset-bottom);
+      box-shadow: 0 -2px 8px rgba(0,0,0,.05); z-index: 100;
+    }
+    .nav-item {
+      flex: 1; display: flex; flex-direction: column; align-items: center;
+      padding: 8px; cursor: pointer; font-size: 10px; color: var(--text-secondary);
+      transition: color .15s;
+    }
+    .nav-item.active { color: var(--primary); }
+    .nav-icon { font-size: 22px; margin-bottom: 2px; }
+
+    /* Modal / Detail panel */
+    .overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.4);
+      z-index: 200; display: none; align-items: flex-end;
+    }
+    .overlay.show { display: flex; }
+    .sheet {
+      background: var(--card); border-radius: 20px 20px 0 0;
+      width: 100%; max-height: 85vh; overflow-y: auto;
+      padding: 20px 20px 30px;
+    }
+    .sheet-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .sheet-title { font-size: 18px; font-weight: 700; }
+    .sheet-close { font-size: 24px; cursor: pointer; color: var(--text-secondary); padding: 4px; }
+    .form-group { margin-bottom: 14px; }
+    .form-label { font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; display: block; text-transform: uppercase; letter-spacing: .5px; }
+    .form-input, .form-select {
+      width: 100%; padding: 10px 14px; border-radius: var(--radius-sm);
+      border: 1.5px solid var(--border); font-size: 14px; outline: none;
+      background: var(--bg); transition: border .15s;
+    }
+    .form-input:focus, .form-select:focus { border-color: var(--primary); }
+    .btn {
+      padding: 10px 24px; border-radius: 10px; border: none;
+      font-size: 14px; font-weight: 600; cursor: pointer;
+      transition: all .15s;
+    }
+    .btn-primary { background: var(--primary); color: #fff; width: 100%; }
+    .btn-primary:active { transform: scale(.97); }
+    .btn-danger { background: var(--danger); color: #fff; }
+    .btn-ghost { background: transparent; color: var(--danger); }
+
+    /* Empty state */
+    .empty { text-align: center; padding: 60px 20px; color: var(--text-secondary); }
+    .empty-icon { font-size: 48px; margin-bottom: 12px; }
+
+    /* Export bar */
+    .export-bar {
+      padding: 12px 16px; display: flex; gap: 8px; flex-wrap: wrap;
+    }
+    .btn-sm {
+      padding: 6px 14px; border-radius: 16px; border: 1.5px solid var(--border);
+      background: var(--card); font-size: 12px; cursor: pointer;
+      color: var(--text-secondary);
+    }
+    .btn-sm:active { background: var(--bg); }
+
+    /* Toast */
+    .toast {
+      position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+      background: #1a202c; color: #fff; padding: 10px 24px;
+      border-radius: 24px; font-size: 13px; z-index: 300;
+      opacity: 0; transition: opacity .3s; pointer-events: none;
+    }
+    .toast.show { opacity: 1; }
+
+    /* Install banner */
+    .install-banner {
+      display: none; background: #dbeafe; padding: 12px 20px;
+      font-size: 13px; color: #1e40af; text-align: center;
+      cursor: pointer; margin: 12px 16px; border-radius: var(--radius-sm);
+    }
+    .install-banner.show { display: block; }
+
+    /* FAB */
+    .fab {
+      position: fixed; bottom: 90px; right: 20px; z-index: 150;
+      width: 52px; height: 52px; border-radius: 50%;
+      background: var(--primary); color: #fff; border: none;
+      font-size: 28px; cursor: pointer;
+      box-shadow: 0 4px 16px rgba(26,86,219,.4);
+      display: flex; align-items: center; justify-content: center;
+      transition: transform .15s;
+    }
+    .fab:active { transform: scale(.9); }
+
+    /* Custom badge */
+    .custom-badge {
+      font-size: 9px; background: #fef3c7; color: #92400e;
+      padding: 1px 6px; border-radius: 6px; margin-left: 6px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-top">
+    <div>
+      <h1>📋 央国企求职追踪</h1>
+      <div class="header-sub">物流管理 · 河北地质大学 · 2027届</div>
+    </div>
+    <div style="font-size:24px;opacity:.7">🏢</div>
+  </div>
+</div>
+
+<!-- Stats -->
+<div class="stats" id="statsRow"></div>
+
+<!-- Filters -->
+<div class="filters" id="filterRow"></div>
+
+<!-- Search -->
+<div class="search-bar">
+  <input type="text" class="search-input" id="searchInput" placeholder="🔍 搜索企业名称、岗位...">
+</div>
+
+<!-- Install banner -->
+<div class="install-banner" id="installBanner" onclick="installPWA()">
+  📲 点此安装到手机桌面，使用更方便
+</div>
+
+<!-- Company list -->
+<div class="list" id="companyList"></div>
+
+<!-- Export bar -->
+<div class="export-bar">
+  <button class="btn-sm" onclick="exportCSV()">📥 导出CSV</button>
+  <button class="btn-sm" onclick="resetAll()">🔄 重置数据</button>
+  <span style="font-size:11px;color:var(--text-secondary);align-self:center;margin-left:auto;">
+    共 <b id="totalCount">0</b> 家企业
+  </span>
+</div>
+
+<!-- FAB -->
+<button class="fab" onclick="openAddSheet()" title="添加企业">+</button>
+
+<!-- Bottom nav -->
+<div class="bottom-nav">
+  <div class="nav-item active" onclick="setView('all')">
+    <span class="nav-icon">🏢</span>全部
+  </div>
+  <div class="nav-item" onclick="setView('todo')">
+    <span class="nav-icon">📝</span>待投递
+  </div>
+  <div class="nav-item" onclick="setView('progress')">
+    <span class="nav-icon">⏳</span>进行中
+  </div>
+  <div class="nav-item" onclick="setView('done')">
+    <span class="nav-icon">✅</span>已结束
+  </div>
+</div>
+
+<!-- Detail Sheet -->
+<div class="overlay" id="overlay" onclick="if(event.target===this)closeSheet()">
+  <div class="sheet" id="sheet">
+    <div class="sheet-header">
+      <div class="sheet-title" id="sheetTitle"></div>
+      <span class="sheet-close" onclick="closeSheet()">✕</span>
+    </div>
+    <div id="sheetBody"></div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== DATA =====
+const TIER_LABELS = {
+  tier1: { name: '基建工程局', cls: 't1', tag: 't1' },
+  tier2: { name: '央企地方分支', cls: 't2', tag: 't2' },
+  tier3: { name: '河北省属国企', cls: 't3', tag: 't3' },
+  tier4: { name: '其他央企子公司', cls: 't4', tag: 't4' }
+};
+
+const COMPANIES = [
+  // Tier 1: 基建工程局
+  { id: 'zt1', name: '中铁一局', tier: 'tier1', positions: '物资管理岗', location: '全国项目地', salary: '8-12万' },
+  { id: 'zt2', name: '中铁二局', tier: 'tier1', positions: '物资管理岗', location: '全国项目地', salary: '8-12万' },
+  { id: 'zt3', name: '中铁三局', tier: 'tier1', positions: '物资管理岗', location: '全国项目地', salary: '8-12万' },
+  { id: 'zt4', name: '中铁四局', tier: 'tier1', positions: '物资管理岗', location: '全国项目地', salary: '8-12万' },
+  { id: 'zt5', name: '中铁五局', tier: 'tier1', positions: '物资管理岗', location: '全国项目地', salary: '8-12万' },
+  { id: 'zt6', name: '中铁六局', tier: 'tier1', positions: '物资管理岗', location: '北京/全国', salary: '8-12万' },
+  { id: 'zt7', name: '中铁七局', tier: 'tier1', positions: '物资管理岗', location: '全国项目地', salary: '8-12万' },
+  { id: 'zt8', name: '中铁八局', tier: 'tier1', positions: '物资管理岗', location: '全国项目地', salary: '8-12万' },
+  { id: 'zt9', name: '中铁九局', tier: 'tier1', positions: '物资管理岗', location: '全国项目地', salary: '8-12万' },
+  { id: 'zt10', name: '中铁十局', tier: 'tier1', positions: '物资管理岗', location: '全国项目地', salary: '8-12万' },
+  { id: 'zt12', name: '中铁十二局', tier: 'tier1', positions: '物资设备岗', location: '太原/全国', salary: '8-12万' },
+  { id: 'zt23', name: '中铁二十三局', tier: 'tier1', positions: '物资管理岗', location: '成都/全国', salary: '8-12万' },
+  { id: 'tj11', name: '中铁十一局（铁建）', tier: 'tier1', positions: '物资物流岗', location: '全国项目地', salary: '8-12万' },
+  { id: 'tj18', name: '中铁十八局（铁建）', tier: 'tier1', positions: '物资物流岗', location: '全国项目地', salary: '8-12万' },
+  { id: 'tj20', name: '中铁二十局（铁建）', tier: 'tier1', positions: '物资物流岗', location: '全国项目地', salary: '8-12万' },
+  { id: 'tj25', name: '中铁二十五局（铁建）', tier: 'tier1', positions: '物资物流岗', location: '全国项目地', salary: '8-12万' },
+  { id: 'tdqj', name: '中铁建大桥工程局', tier: 'tier1', positions: '物资管理岗', location: '天津/全国', salary: '8-12万' },
+  { id: 'zj1', name: '中建一局', tier: 'tier1', positions: '物资管理/供应链岗', location: '全国', salary: '9-13万' },
+  { id: 'zj2', name: '中建二局', tier: 'tier1', positions: '物资管理/供应链岗', location: '全国', salary: '9-13万' },
+  { id: 'zj3', name: '中建三局', tier: 'tier1', positions: '物资管理/供应链岗', location: '全国', salary: '9-13万' },
+  { id: 'zj5', name: '中建五局', tier: 'tier1', positions: '物资管理/供应链岗', location: '全国', salary: '9-13万' },
+  { id: 'zj8', name: '中建八局', tier: 'tier1', positions: '物资管理/供应链岗', location: '全国', salary: '9-13万' },
+  { id: 'zjj1', name: '中交一公局', tier: 'tier1', positions: '物资采购/物流管理', location: '全国+海外', salary: '10-15万' },
+  { id: 'zjj2', name: '中交二公局', tier: 'tier1', positions: '物资采购/物流管理', location: '全国+海外', salary: '10-15万' },
+  { id: 'zdj', name: '中国电建（各工程局）', tier: 'tier1', positions: '物资采购岗', location: '全国', salary: '8-12万' },
+  { id: 'znj', name: '中国能建（各工程局）', tier: 'tier1', positions: '物资管理岗', location: '全国', salary: '8-12万' },
+
+  // Tier 2: 央企地方分支
+  { id: 'chinapost', name: '中国邮政（省/市公司）', tier: 'tier2', positions: '物流运营/投递管理', location: '河北省内各市', salary: '7-10万' },
+  { id: 'gtbj', name: '国铁北京局', tier: 'tier2', positions: '货运管理/物流调度', location: '北京局辖区', salary: '8-12万' },
+  { id: 'gtty', name: '国铁太原局', tier: 'tier2', positions: '货运管理/物流调度', location: '太原局辖区', salary: '8-12万' },
+  { id: 'gtjn', name: '国铁济南局', tier: 'tier2', positions: '货运管理/物流调度', location: '济南局辖区', salary: '8-12万' },
+  { id: 'gtht', name: '国铁呼和浩特局', tier: 'tier2', positions: '货运管理/物流调度', location: '呼和浩特局辖区', salary: '8-12万' },
+  { id: 'gtzz', name: '国铁郑州局', tier: 'tier2', positions: '货运管理/物流调度', location: '郑州局辖区', salary: '8-12万' },
+  { id: 'dhwl', name: '东航物流（各地分点）', tier: 'tier2', positions: '货运运营', location: '各地机场', salary: '8-10万' },
+  { id: 'zcc', name: '中储股份各地分公司', tier: 'tier2', positions: '仓储管理/物流运营', location: '分布全国', salary: '7-10万' },
+  { id: 'gxll', name: '中国供销冷链（石家庄正定）', tier: 'tier2', positions: '仓储运营/冷链物流', location: '石家庄正定', salary: '7-9万' },
+  { id: 'syhb', name: '中石油河北销售公司', tier: 'tier2', positions: '物资管理/油品物流调度', location: '河北省内', salary: '8-10万' },
+  { id: 'shhb', name: '中石化河北石油公司', tier: 'tier2', positions: '物资管理/油品物流调度', location: '河北省内', salary: '8-10万' },
+
+  // Tier 3: 河北省属国企
+  { id: 'hbwljt', name: '🏆 河北省物流产业集团', tier: 'tier3', positions: '物流管理/仓储运营/贸易', location: '石家庄', salary: '8-10万' },
+  { id: 'hbgk', name: '河北港口集团', tier: 'tier3', positions: '港口物流/仓储管理', location: '秦皇岛/唐山/黄骅', salary: '8-12万' },
+  { id: 'hggg', name: '河钢集团', tier: 'tier3', positions: '采购管理/供应链/成品物流', location: '石家庄/唐山/邯郸', salary: '8-10万' },
+  { id: 'hbjt', name: '河北交投物流有限公司', tier: 'tier3', positions: '物流管理岗', location: '石家庄', salary: '7-9万' },
+  { id: 'hbgs', name: '河北高速集团（京石高速）', tier: 'tier3', positions: '运营管理/物流', location: '河北省内', salary: '7-10万' },
+  { id: 'xtjt', name: '邢台市交通建设集团', tier: 'tier3', positions: '物流/运输管理', location: '邢台', salary: '7-9万' },
+  { id: 'sjzsz', name: '石家庄市政建设集团', tier: 'tier3', positions: '物资管理', location: '石家庄', salary: '7-9万' },
+  { id: 'hbjtjt', name: '河北建投集团', tier: 'tier3', positions: '供应链/采购管理', location: '石家庄', salary: '8-10万' },
+  { id: 'tsgs', name: '唐山高速公路集团', tier: 'tier3', positions: '运营/物流管理', location: '唐山', salary: '7-9万' },
+
+  // Tier 4: 其他央企子公司
+  { id: 'wuliu_zg', name: '中国物流集团旗下子公司', tier: 'tier4', positions: '物流运营/仓储', location: '各地', salary: '8-10万' },
+  { id: 'zywy', name: '中国外运各地分公司', tier: 'tier4', positions: '物流管培生/运营', location: '各地', salary: '8-10万' },
+  { id: 'ztwz', name: '中铁物资集团', tier: 'tier4', positions: '物资采购', location: '各地', salary: '8-10万' },
+  { id: 'zl_region', name: '中粮集团（区域公司）', tier: 'tier4', positions: '供应链/物流', location: '各地', salary: '8-10万' },
+  { id: 'hr_region', name: '华润医药/华润万家', tier: 'tier4', positions: '物流管理', location: '各地', salary: '8-10万' },
+  { id: 'cnbm', name: '中国建材集团成员企业', tier: 'tier4', positions: '物资采购', location: '各地', salary: '7-9万' },
+  { id: 'zcc_subs', name: '中国中车子公司', tier: 'tier4', positions: '供应链/物流', location: '各地', salary: '8-10万' },
+];
+
+const STATUSES = ['未投递', '已投递', '测评中', '笔试', '面试', '已录用', '已拒绝', '放弃'];
+const STATUS_FLOW = {
+  '未投递': 0,
+  '已投递': 1,
+  '测评中': 2,
+  '笔试': 3,
+  '面试': 4,
+  '已录用': 5,
+  '已拒绝': 6,
+  '放弃': 7
+};
+
+// ===== STATE =====
+let currentFilter = 'all';
+let currentView = 'all';
+
+function getCustomCompanies() {
+  const raw = localStorage.getItem('job-tracker-custom');
+  return raw ? JSON.parse(raw) : [];
+}
+
+function saveCustomCompanies(list) {
+  localStorage.setItem('job-tracker-custom', JSON.stringify(list));
+}
+
+function getAllCompanies() {
+  return [...COMPANIES, ...getCustomCompanies()];
+}
+
+function getData() {
+  const raw = localStorage.getItem('job-tracker-data');
+  const all = getAllCompanies();
+  if (raw) {
+    const data = JSON.parse(raw);
+    // Ensure all companies (including newly added custom) have entries
+    all.forEach(c => {
+      if (!data[c.id]) {
+        data[c.id] = { status: '未投递', applyDate: '', applyChannel: '', applyUrl: '', notes: '' };
+      }
+    });
+    return data;
+  }
+  // Init with defaults
+  const data = {};
+  all.forEach(c => {
+    data[c.id] = {
+      status: '未投递',
+      applyDate: '',
+      applyChannel: '',
+      applyUrl: '',
+      notes: ''
+    };
+  });
+  saveData(data);
+  return data;
+}
+
+function saveData(data) {
+  localStorage.setItem('job-tracker-data', JSON.stringify(data));
+}
+
+// ===== RENDER =====
+function renderStats() {
+  const data = getData();
+  const total = getAllCompanies().length;
+  let applied = 0, interviewing = 0, offered = 0;
+  Object.values(data).forEach(d => {
+    if (d.status !== '未投递' && d.status !== '放弃') applied++;
+    if (d.status === '面试') interviewing++;
+    if (d.status === '已录用') offered++;
+  });
+
+  document.getElementById('statsRow').innerHTML = `
+    <div class="stat-card total"><div class="num">${total}</div><div class="label">目标企业</div></div>
+    <div class="stat-card applied"><div class="num">${applied}</div><div class="label">已投递/进行中</div></div>
+    <div class="stat-card interview"><div class="num">${interviewing}</div><div class="label">面试中</div></div>
+    <div class="stat-card offer"><div class="num">${offered}</div><div class="label">已录用</div></div>
+    <div class="stat-card"><div class="num">${Math.round(applied/total*100)}%</div><div class="label">投递率</div></div>
+  `;
+}
+
+function renderFilters() {
+  const customCount = getCustomCompanies().length;
+  const tiers = ['all', 'tier1', 'tier2', 'tier3', 'tier4', 'custom'];
+  const labels = { all: '全部', tier1: '基建工程局', tier2: '央企分支', tier3: '河北省属', tier4: '其他央企', custom: `⭐ 自定义${customCount?'('+customCount+')':''}` };
+  document.getElementById('filterRow').innerHTML = tiers.map(t =>
+    `<button class="filter-btn ${currentFilter===t?'active':''}" onclick="setFilter('${t}')">${labels[t]}</button>`
+  ).join('');
+}
+
+function renderList() {
+  const data = getData();
+  const search = (document.getElementById('searchInput').value || '').toLowerCase();
+  const all = getAllCompanies();
+
+  let companies = all.filter(c => {
+    if (currentFilter === 'custom') return c.custom;
+    if (currentFilter !== 'all' && c.tier !== currentFilter) return false;
+    const status = data[c.id].status;
+    if (currentView === 'todo') return status === '未投递';
+    if (currentView === 'progress') return ['已投递','测评中','笔试','面试'].includes(status);
+    if (currentView === 'done') return ['已录用','已拒绝','放弃'].includes(status);
+    return true;
+  });
+
+  if (search) {
+    companies = companies.filter(c =>
+      c.name.toLowerCase().includes(search) ||
+      c.positions.toLowerCase().includes(search) ||
+      c.location.toLowerCase().includes(search)
+    );
+  }
+
+  document.getElementById('totalCount').textContent = companies.length;
+
+  if (companies.length === 0) {
+    document.getElementById('companyList').innerHTML = `
+      <div class="empty"><div class="empty-icon">📭</div><p>没有匹配的企业</p></div>`;
+    return;
+  }
+
+  document.getElementById('companyList').innerHTML = companies.map(c => {
+    const d = data[c.id];
+    const tierInfo = c.custom ? { name: '自定义', tag: 't4' } : TIER_LABELS[c.tier];
+    return `
+      <div class="company-card ${c.tier||'tier4'}" onclick="openDetail('${c.id}')">
+        <div class="card-top">
+          <div class="card-name">${c.name}${c.custom?'<span class="custom-badge">自建</span>':''}</div>
+          <span class="card-tier ${tierInfo.tag}">${tierInfo.name}</span>
+        </div>
+        <div class="card-info">
+          <span>📌 ${c.positions}</span>
+          <span>📍 ${c.location}</span>
+          ${c.salary ? `<span>💰 ${c.salary}</span>` : ''}
+        </div>
+        <div class="card-bottom">
+          <span class="status-badge status-${d.status}">${d.status}</span>
+          <span class="card-date">${d.applyDate || '未记录日期'}</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderAll() {
+  renderStats();
+  renderFilters();
+  renderList();
+}
+
+// ===== FILTERS =====
+function setFilter(tier) {
+  currentFilter = tier;
+  renderAll();
+}
+
+function setView(view) {
+  currentView = view;
+  document.querySelectorAll('.nav-item').forEach((el, i) => {
+    el.classList.toggle('active', ['all','todo','progress','done'][i] === view);
+  });
+  renderList();
+}
+
+document.getElementById('searchInput').addEventListener('input', renderList);
+
+// ===== ADD COMPANY SHEET =====
+function openAddSheet() {
+  document.getElementById('sheetTitle').textContent = '➕ 添加企业';
+  document.getElementById('sheetBody').innerHTML = `
+    <div class="form-group">
+      <label class="form-label">企业名称 *</label>
+      <input type="text" class="form-input" id="addName" placeholder="例如：顺丰速运、比亚迪供应链...">
+    </div>
+    <div class="form-group">
+      <label class="form-label">所属梯队</label>
+      <select class="form-select" id="addTier">
+        <option value="tier1">基建工程局</option>
+        <option value="tier2">央企地方分支</option>
+        <option value="tier3">河北省属国企</option>
+        <option value="tier4">其他央企/国企</option>
+        <option value="custom">自定义分类</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">对口岗位</label>
+      <input type="text" class="form-input" id="addPosition" placeholder="例如：物流管理岗、供应链专员...">
+    </div>
+    <div class="form-group">
+      <label class="form-label">工作地点</label>
+      <input type="text" class="form-input" id="addLocation" placeholder="例如：石家庄、北京...">
+    </div>
+    <div class="form-group">
+      <label class="form-label">参考薪资</label>
+      <input type="text" class="form-input" id="addSalary" placeholder="例如：8-12万">
+    </div>
+    <div class="form-group">
+      <label class="form-label">投递状态</label>
+      <select class="form-select" id="addStatus">
+        ${STATUSES.map(s => `<option value="${s}">${s}</option>`).join('')}
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">投递日期</label>
+      <input type="date" class="form-input" id="addDate">
+    </div>
+    <div class="form-group">
+      <label class="form-label">投递链接/网址</label>
+      <input type="url" class="form-input" id="addUrl" placeholder="粘贴网申链接...">
+    </div>
+    <div class="form-group">
+      <label class="form-label">备注</label>
+      <input type="text" class="form-input" id="addNotes" placeholder="补充信息...">
+    </div>
+    <button class="btn btn-primary" onclick="saveNewCompany()">✅ 添加企业</button>
+  `;
+  document.getElementById('overlay').classList.add('show');
+}
+
+function saveNewCompany() {
+  const name = document.getElementById('addName').value.trim();
+  if (!name) { showToast('请输入企业名称'); return; }
+
+  const tier = document.getElementById('addTier').value;
+  const newId = 'custom_' + Date.now();
+
+  const newCompany = {
+    id: newId,
+    name: name,
+    tier: tier === 'custom' ? 'tier4' : tier,
+    custom: true,
+    positions: document.getElementById('addPosition').value.trim() || '未填写',
+    location: document.getElementById('addLocation').value.trim() || '未填写',
+    salary: document.getElementById('addSalary').value.trim() || ''
+  };
+
+  // Save to custom list
+  const customList = getCustomCompanies();
+  customList.push(newCompany);
+  saveCustomCompanies(customList);
+
+  // Save tracking data
+  const data = getData();
+  data[newId] = {
+    status: document.getElementById('addStatus').value,
+    applyDate: document.getElementById('addDate').value,
+    applyChannel: '',
+    applyUrl: document.getElementById('addUrl').value,
+    notes: document.getElementById('addNotes').value
+  };
+  saveData(data);
+
+  closeSheet();
+  renderAll();
+  showToast('✅ ' + name + ' 已添加！');
+}
+
+// ===== DETAIL SHEET =====
+function openDetail(companyId) {
+  const data = getData();
+  const c = getAllCompanies().find(x => x.id === companyId);
+  if (!c) return;
+  const d = data[companyId];
+  const tierInfo = c.custom ? { name: '自定义', tag: 't4' } : TIER_LABELS[c.tier];
+
+  document.getElementById('sheetTitle').textContent = c.name;
+  document.getElementById('sheetBody').innerHTML = `
+    <div style="margin-bottom:8px;font-size:13px;color:var(--text-secondary);">
+      <span class="card-tier ${tierInfo.tag}" style="margin-right:8px;">${tierInfo.name}</span>
+      ${c.positions} · ${c.location} · ${c.salary}
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">投递状态</label>
+      <select class="form-select" id="editStatus" onchange="quickSave('${companyId}')">
+        ${STATUSES.map(s => `<option value="${s}" ${d.status===s?'selected':''}>${s}</option>`).join('')}
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">投递日期</label>
+      <input type="date" class="form-input" id="editDate" value="${d.applyDate}" onchange="quickSave('${companyId}')">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">投递渠道</label>
+      <select class="form-select" id="editChannel" onchange="quickSave('${companyId}')">
+        <option value="">未选择</option>
+        <option value="企业官网" ${d.applyChannel==='企业官网'?'selected':''}>企业官网</option>
+        <option value="国聘网" ${d.applyChannel==='国聘网'?'selected':''}>国聘网 (iguopin.com)</option>
+        <option value="应届生求职网" ${d.applyChannel==='应届生求职网'?'selected':''}>应届生求职网</option>
+        <option value="前程无忧" ${d.applyChannel==='前程无忧'?'selected':''}>前程无忧</option>
+        <option value="智联招聘" ${d.applyChannel==='智联招聘'?'selected':''}>智联招聘</option>
+        <option value="学校就业网" ${d.applyChannel==='学校就业网'?'selected':''}>学校就业网</option>
+        <option value="铁路人才招聘网" ${d.applyChannel==='铁路人才招聘网'?'selected':''}>铁路人才招聘网</option>
+        <option value="其他" ${d.applyChannel==='其他'?'selected':''}>其他</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">投递链接/网址</label>
+      <input type="url" class="form-input" id="editUrl" value="${d.applyUrl}" placeholder="粘贴网申链接..." onchange="quickSave('${companyId}')">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">备注</label>
+      <input type="text" class="form-input" id="editNotes" value="${d.notes}" placeholder="笔试时间、面试时间、联系人等..." onchange="quickSave('${companyId}')">
+    </div>
+
+    <div style="display:flex;gap:8px;margin-top:8px;">
+      ${c.custom
+        ? `<button class="btn btn-danger btn-ghost" style="flex:1;font-size:12px;" onclick="removeCustomCompany('${companyId}')">🗑 删除企业</button>`
+        : `<button class="btn btn-danger btn-ghost" style="flex:1;font-size:12px;" onclick="deleteCompany('${companyId}')">🗑 恢复默认</button>`
+      }
+    </div>
+  `;
+
+  // Update date to today when status changes to "已投递" from "未投递"
+  const statusSelect = document.getElementById('editStatus');
+  statusSelect.addEventListener('change', function() {
+    if (this.value === '已投递' && !document.getElementById('editDate').value) {
+      document.getElementById('editDate').value = new Date().toISOString().split('T')[0];
+    }
+    quickSave(companyId);
+  });
+
+  document.getElementById('overlay').classList.add('show');
+}
+
+function closeSheet() {
+  document.getElementById('overlay').classList.remove('show');
+}
+
+function quickSave(companyId) {
+  const data = getData();
+  data[companyId] = {
+    status: document.getElementById('editStatus').value,
+    applyDate: document.getElementById('editDate').value,
+    applyChannel: document.getElementById('editChannel').value,
+    applyUrl: document.getElementById('editUrl').value,
+    notes: document.getElementById('editNotes').value
+  };
+  saveData(data);
+  renderAll();
+}
+
+function deleteCompany(companyId) {
+  if (!confirm('确定要清除这家企业的投递记录吗？')) return;
+  const data = getData();
+  data[companyId] = { status: '未投递', applyDate: '', applyChannel: '', applyUrl: '', notes: '' };
+  saveData(data);
+  closeSheet();
+  renderAll();
+  showToast('已恢复默认状态');
+}
+
+// ===== UTILS =====
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2000);
+}
+
+function exportCSV() {
+  const data = getData();
+  const rows = [['企业名称','梯队','岗位','地点','薪资','状态','投递日期','投递渠道','投递链接','备注']];
+  getAllCompanies().forEach(c => {
+    const d = data[c.id];
+    const tierName = c.custom ? '自定义' : TIER_LABELS[c.tier].name;
+    rows.push([c.name, tierName, c.positions, c.location, c.salary, d.status, d.applyDate, d.applyChannel, d.applyUrl, d.notes]);
+  });
+  const csv = '\uFEFF' + rows.map(r => r.map(v => `"${(v||'').replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `央国企求职追踪_${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('CSV已下载！');
+}
+
+function resetAll() {
+  if (!confirm('确定要清除所有投递记录吗？自定义企业也会被删除。此操作不可恢复！')) return;
+  localStorage.removeItem('job-tracker-data');
+  localStorage.removeItem('job-tracker-custom');
+  renderAll();
+  showToast('数据已重置');
+}
+
+function removeCustomCompany(companyId) {
+  if (!confirm('确定要删除这家企业吗？此操作不可恢复！')) return;
+  const customList = getCustomCompanies().filter(c => c.id !== companyId);
+  saveCustomCompanies(customList);
+  const data = getData();
+  delete data[companyId];
+  saveData(data);
+  closeSheet();
+  renderAll();
+  showToast('已删除');
+}
+
+// ===== PWA Install =====
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('installBanner').classList.add('show');
+});
+
+function installPWA() {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then(() => {
+    document.getElementById('installBanner').classList.remove('show');
+    deferredPrompt = null;
+    showToast('已添加到桌面！');
+  });
+}
+
+// Detect standalone mode
+if (window.matchMedia('(display-mode: standalone)').matches) {
+  document.getElementById('installBanner').style.display = 'none';
+}
+
+// ===== SERVICE WORKER =====
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+
+// ===== INIT =====
+renderAll();
+</script>
+</body>
+</html>
