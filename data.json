@@ -1,387 +1,458 @@
 {
-  "v": 1,
-  "t": "2026-06-25T10:18:41.560Z",
+  "v": 2,
+  "t": 1782486186425,
   "data": {
     "zt1": {
       "status": "未投递",
       "applyDate": "",
       "applyChannel": "",
       "applyUrl": "",
-      "notes": ""
+      "notes": "",
+      "_t": 1782382707967
     },
     "zt2": {
       "status": "未投递",
       "applyDate": "",
       "applyChannel": "",
       "applyUrl": "",
-      "notes": ""
+      "notes": "",
+      "_t": 1782382707967
     },
     "zt3": {
       "status": "未投递",
       "applyDate": "",
       "applyChannel": "",
       "applyUrl": "",
-      "notes": ""
+      "notes": "",
+      "_t": 1782382707967
     },
     "zt4": {
       "status": "未投递",
       "applyDate": "",
       "applyChannel": "",
       "applyUrl": "",
-      "notes": ""
+      "notes": "",
+      "_t": 1782382707967
     },
     "zt5": {
       "status": "未投递",
       "applyDate": "",
       "applyChannel": "",
       "applyUrl": "",
-      "notes": ""
+      "notes": "",
+      "_t": 1782382707967
     },
     "zt6": {
       "status": "未投递",
       "applyDate": "",
       "applyChannel": "",
       "applyUrl": "",
-      "notes": ""
+      "notes": "",
+      "_t": 1782382707967
     },
     "zt7": {
       "status": "未投递",
       "applyDate": "",
       "applyChannel": "",
       "applyUrl": "",
-      "notes": ""
+      "notes": "",
+      "_t": 1782382707967
     },
     "zt8": {
       "status": "未投递",
       "applyDate": "",
       "applyChannel": "",
       "applyUrl": "",
-      "notes": ""
+      "notes": "",
+      "_t": 1782382707967
     },
     "zt9": {
       "status": "未投递",
       "applyDate": "",
       "applyChannel": "",
       "applyUrl": "",
-      "notes": ""
+      "notes": "",
+      "_t": 1782382707967
     },
     "zt10": {
       "status": "未投递",
       "applyDate": "",
       "applyChannel": "",
       "applyUrl": "",
-      "notes": ""
+      "notes": "",
+      "_t": 1782382707967
     },
     "zt12": {
       "status": "未投递",
       "applyDate": "",
       "applyChannel": "",
       "applyUrl": "",
-      "notes": ""
+      "notes": "",
+      "_t": 1782382707967
     },
     "zt23": {
       "status": "未投递",
       "applyDate": "",
       "applyChannel": "",
       "applyUrl": "",
-      "notes": ""
+      "notes": "",
+      "_t": 1782382707967
     },
     "tj11": {
       "status": "未投递",
       "applyDate": "",
       "applyChannel": "",
       "applyUrl": "",
-      "notes": ""
+      "notes": "",
+      "_t": 1782382707967
     },
     "tj18": {
       "status": "未投递",
       "applyDate": "",
       "applyChannel": "",
       "applyUrl": "",
-      "notes": ""
+      "notes": "",
+      "_t": 1782382707967
     },
     "tj20": {
       "status": "未投递",
       "applyDate": "",
       "applyChannel": "",
       "applyUrl": "",
-      "notes": ""
+      "notes": "",
+      "_t": 1782382707967
     },
     "tj25": {
       "status": "未投递",
       "applyDate": "",
       "applyChannel": "",
       "applyUrl": "",
-      "notes": ""
+      "notes": "",
+      "_t": 1782382707967
     },
     "tdqj": {
       "status": "未投递",
       "applyDate": "",
       "applyChannel": "",
       "applyUrl": "",
-      "notes": ""
+      "notes": "",
+      "_t": 1782382707967
     },
     "zj1": {
       "status": "未投递",
       "applyDate": "",
       "applyChannel": "",
       "applyUrl": "",
-      "notes": ""
+      "notes": "",
+      "_t": 1782382707967
     },
     "zj2": {
       "status": "未投递",
       "applyDate": "",
       "applyChannel": "",
       "applyUrl": "",
-      "notes": ""
+      "notes": "",
+      "_t": 1782382707967
     },
     "zj3": {
       "status": "未投递",
       "applyDate": "",
       "applyChannel": "",
       "applyUrl": "",
-      "notes": ""
+      "notes": "",
+      "_t": 1782382707967
     },
     "zj5": {
       "status": "未投递",
       "applyDate": "",
       "applyChannel": "",
       "applyUrl": "",
-      "notes": ""
+      "notes": "",
+      "_t": 1782382707967
     },
     "zj8": {
       "status": "未投递",
       "applyDate": "",
       "applyChannel": "",
       "applyUrl": "",
-      "notes": ""
+      "notes": "",
+      "_t": 1782382707967
     },
     "zjj1": {
       "status": "未投递",
       "applyDate": "",
       "applyChannel": "",
       "applyUrl": "",
-      "notes": ""
+      "notes": "",
+      "_t": 1782382707967
     },
     "zjj2": {
       "status": "未投递",
       "applyDate": "",
       "applyChannel": "",
       "applyUrl": "",
-      "notes": ""
+      "notes": "",
+      "_t": 1782382707967
     },
     "zdj": {
       "status": "未投递",
       "applyDate": "",
       "applyChannel": "",
       "applyUrl": "",
-      "notes": ""
+      "notes": "",
+      "_t": 1782382707967
     },
     "znj": {
       "status": "未投递",
       "applyDate": "",
       "applyChannel": "",
       "applyUrl": "",
-      "notes": ""
+      "notes": "",
+      "_t": 1782382707967
     },
     "chinapost": {
       "status": "未投递",
       "applyDate": "",
       "applyChannel": "",
       "applyUrl": "",
-      "notes": ""
+      "notes": "",
+      "_t": 1782382707967
     },
     "gtbj": {
       "status": "未投递",
       "applyDate": "",
       "applyChannel": "",
       "applyUrl": "",
-      "notes": ""
+      "notes": "",
+      "_t": 1782382707967
     },
     "gtty": {
       "status": "未投递",
       "applyDate": "",
       "applyChannel": "",
       "applyUrl": "",
-      "notes": ""
+      "notes": "",
+      "_t": 1782382707967
     },
     "gtjn": {
       "status": "未投递",
       "applyDate": "",
       "applyChannel": "",
       "applyUrl": "",
-      "notes": ""
+      "notes": "",
+      "_t": 1782382707967
     },
     "gtht": {
       "status": "未投递",
       "applyDate": "",
       "applyChannel": "",
       "applyUrl": "",
-      "notes": ""
+      "notes": "",
+      "_t": 1782382707967
     },
     "gtzz": {
       "status": "未投递",
       "applyDate": "",
       "applyChannel": "",
       "applyUrl": "",
-      "notes": ""
+      "notes": "",
+      "_t": 1782382707967
     },
     "dhwl": {
       "status": "未投递",
       "applyDate": "",
       "applyChannel": "",
       "applyUrl": "",
-      "notes": ""
+      "notes": "",
+      "_t": 1782382707967
     },
     "zcc": {
       "status": "未投递",
       "applyDate": "",
       "applyChannel": "",
       "applyUrl": "",
-      "notes": ""
+      "notes": "",
+      "_t": 1782382707967
     },
     "gxll": {
       "status": "未投递",
       "applyDate": "",
       "applyChannel": "",
       "applyUrl": "",
-      "notes": ""
+      "notes": "",
+      "_t": 1782382707967
     },
     "syhb": {
       "status": "未投递",
       "applyDate": "",
       "applyChannel": "",
       "applyUrl": "",
-      "notes": ""
+      "notes": "",
+      "_t": 1782382707967
     },
     "shhb": {
       "status": "未投递",
       "applyDate": "",
       "applyChannel": "",
       "applyUrl": "",
-      "notes": ""
+      "notes": "",
+      "_t": 1782382707967
     },
     "hbwljt": {
       "status": "未投递",
       "applyDate": "",
       "applyChannel": "",
       "applyUrl": "",
-      "notes": ""
+      "notes": "",
+      "_t": 1782382707967
     },
     "hbgk": {
       "status": "未投递",
       "applyDate": "",
       "applyChannel": "",
       "applyUrl": "",
-      "notes": ""
+      "notes": "",
+      "_t": 1782382707967
     },
     "hggg": {
       "status": "未投递",
       "applyDate": "",
       "applyChannel": "",
       "applyUrl": "",
-      "notes": ""
+      "notes": "",
+      "_t": 1782382707967
     },
     "hbjt": {
       "status": "未投递",
       "applyDate": "",
       "applyChannel": "",
       "applyUrl": "",
-      "notes": ""
+      "notes": "",
+      "_t": 1782382707967
     },
     "hbgs": {
       "status": "未投递",
       "applyDate": "",
       "applyChannel": "",
       "applyUrl": "",
-      "notes": ""
+      "notes": "",
+      "_t": 1782382707967
     },
     "xtjt": {
       "status": "未投递",
       "applyDate": "",
       "applyChannel": "",
       "applyUrl": "",
-      "notes": ""
+      "notes": "",
+      "_t": 1782382707967
     },
     "sjzsz": {
       "status": "未投递",
       "applyDate": "",
       "applyChannel": "",
       "applyUrl": "",
-      "notes": ""
+      "notes": "",
+      "_t": 1782382707967
     },
     "hbjtjt": {
       "status": "未投递",
       "applyDate": "",
       "applyChannel": "",
       "applyUrl": "",
-      "notes": ""
+      "notes": "",
+      "_t": 1782382707967
     },
     "tsgs": {
       "status": "未投递",
       "applyDate": "",
       "applyChannel": "",
       "applyUrl": "",
-      "notes": ""
+      "notes": "",
+      "_t": 1782382707967
     },
     "wuliu_zg": {
       "status": "未投递",
       "applyDate": "",
       "applyChannel": "",
       "applyUrl": "",
-      "notes": ""
+      "notes": "",
+      "_t": 1782382707967
     },
     "zywy": {
       "status": "未投递",
       "applyDate": "",
       "applyChannel": "",
       "applyUrl": "",
-      "notes": ""
+      "notes": "",
+      "_t": 1782382707967
     },
     "ztwz": {
       "status": "未投递",
       "applyDate": "",
       "applyChannel": "",
       "applyUrl": "",
-      "notes": ""
+      "notes": "",
+      "_t": 1782382707967
     },
     "zl_region": {
       "status": "未投递",
       "applyDate": "",
       "applyChannel": "",
       "applyUrl": "",
-      "notes": ""
+      "notes": "",
+      "_t": 1782382707967
     },
     "hr_region": {
       "status": "未投递",
       "applyDate": "",
       "applyChannel": "",
       "applyUrl": "",
-      "notes": ""
+      "notes": "",
+      "_t": 1782382707967
     },
     "cnbm": {
       "status": "未投递",
       "applyDate": "",
       "applyChannel": "",
       "applyUrl": "",
-      "notes": ""
+      "notes": "",
+      "_t": 1782382707967
     },
     "zcc_subs": {
       "status": "未投递",
       "applyDate": "",
       "applyChannel": "",
       "applyUrl": "",
-      "notes": ""
+      "notes": "",
+      "_t": 1782382707967
+    },
+    "custom_1782382707966": {
+      "status": "未投递",
+      "applyDate": "",
+      "applyChannel": "",
+      "applyUrl": "",
+      "notes": "",
+      "_t": 1782382707967
     },
     "custom_1782380496484": {
       "status": "未投递",
       "applyDate": "",
       "applyChannel": "",
       "applyUrl": "",
-      "notes": ""
+      "notes": "",
+      "_t": 1782486186425
     }
   },
   "custom": [
+    {
+      "id": "custom_1782382707966",
+      "name": "顺丰快递",
+      "tier": "tier4",
+      "custom": true,
+      "positions": "未填写",
+      "location": "未填写",
+      "salary": ""
+    },
     {
       "id": "custom_1782380496484",
       "name": "京东",
