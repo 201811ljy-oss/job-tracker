@@ -1,6 +1,6 @@
 {
   "v": 2,
-  "t": 1782486186425,
+  "t": 1783308754460,
   "data": {
     "zt1": {
       "status": "未投递",
@@ -441,6 +441,14 @@
       "applyUrl": "",
       "notes": "",
       "_t": 1782486186425
+    },
+    "custom_1783308752625": {
+      "status": "未投递",
+      "applyDate": "",
+      "applyChannel": "",
+      "applyUrl": "",
+      "notes": "",
+      "_t": 1783308752627
     }
   },
   "custom": [
@@ -459,6 +467,15 @@
       "tier": "tier4",
       "custom": true,
       "positions": "物流",
+      "location": "未填写",
+      "salary": ""
+    },
+    {
+      "id": "custom_1783308752625",
+      "name": "比亚迪",
+      "tier": "tier4",
+      "custom": true,
+      "positions": "未填写",
       "location": "未填写",
       "salary": ""
     }
