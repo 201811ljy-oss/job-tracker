@@ -1052,31 +1052,51 @@ async function doSync() {
   try {
     const cloud = await loadCloud();
     if (cloud && cloud.data) {
-      // 云端有数据，合入本地
       mergeCloudIntoLocal(cloud);
-      // 如果本地也有更新，推回云端
       const localPayload = buildCloudPayload();
-      if (cloud.t && localPayload.t > cloud.t) {
-        // 本地更新
-      }
-      // 始终推送（本地可能是和云端相同的合并结果，也可能是更新的）
       const ok = await pushCloud(localPayload);
-      setSyncStatus(ok ? 'synced' : 'offline', ok ? '✅ 已同步' : '⚠️ 推送失败');
       if (ok) {
-        console.log('☁️ 同步成功');
+        setSyncStatus('synced', '✅ 已同步');
+      } else {
+        // 推送失败，检查 Token 是否过期
+        const tokenCheck = await checkToken();
+        if (!tokenCheck) {
+          setSyncStatus('offline', '⚠️ Token 失效');
+          showToast('🔴 Token 已过期，请点 ⚙️ 重新配置', 5000);
+        } else {
+          setSyncStatus('offline', '⚠️ 推送失败');
+        }
       }
     } else {
-      // 云端无数据，推送本地
       const payload = buildCloudPayload();
       const ok = await pushCloud(payload);
-      setSyncStatus(ok ? 'synced' : 'offline', ok ? '✅ 已同步' : '⚠️ 推送失败');
+      if (ok) {
+        setSyncStatus('synced', '✅ 已同步');
+      } else {
+        const tokenCheck = await checkToken();
+        if (!tokenCheck) {
+          setSyncStatus('offline', '⚠️ Token 失效');
+          showToast('🔴 Token 已过期，请点 ⚙️ 重新配置', 5000);
+        } else {
+          setSyncStatus('offline', '⚠️ 推送失败');
+        }
+      }
     }
-    // 重新渲染以显示合并后的数据
     renderAll();
   } catch(e) {
     setSyncStatus('offline', '⚠️ 网络错误');
     console.error('Sync error:', e);
   }
+}
+
+// 检查 Token 是否有效
+async function checkToken() {
+  try {
+    const res = await fetch('https://api.github.com/user', {
+      headers: { 'Authorization': `token ${getToken()}` }
+    });
+    return res.ok;
+  } catch(e) { return false; }
 }
 
 // 主动同步（用户手动点）
