@@ -999,7 +999,7 @@ function buildCloudPayload() {
   };
 }
 
-// 合并策略：按每个企业的最新时间戳决定，没有时间戳的保留较有价值的一方
+// 合并策略：保留本地预置企业 + 合并云端自定义企业 + 合并追踪数据（按时间戳）
 function mergeCloudIntoLocal(cloud) {
   if (!cloud || !cloud.data) return;
 
@@ -1007,13 +1007,13 @@ function mergeCloudIntoLocal(cloud) {
   const localCustom = JSON.parse(localStorage.getItem('job-tracker-custom') || '[]');
   let changed = false;
 
-  // 合并追踪数据
+  // 合并追踪数据：云端覆盖本地（按时间戳），但保留本地所有企业ID
   const merged = { ...localData };
   Object.keys(cloud.data).forEach(id => {
     const cd = cloud.data[id];
     const ld = localData[id];
     if (!ld) {
-      // 本地没有，直接用云端
+      // 本地没有，直接用云端（这是自定义企业或新数据）
       merged[id] = cd;
       changed = true;
     } else if (cd._t && (!ld._t || cd._t > ld._t)) {
@@ -1027,6 +1027,15 @@ function mergeCloudIntoLocal(cloud) {
       if (cdLen > ldLen) { merged[id] = cd; changed = true; }
     }
   });
+
+  // 确保预置企业的数据条目存在（如果云端没有，用本地默认）
+  COMPANIES.forEach(c => {
+    if (!merged[c.id]) {
+      merged[c.id] = { status: '未投递', applyDate: '', applyChannel: '', applyUrl: '', notes: '' };
+      changed = true;
+    }
+  });
+
   if (changed) {
     localStorage.setItem('job-tracker-data', JSON.stringify(merged));
   }
@@ -1145,8 +1154,10 @@ saveCustomCompanies = function(list) {
 };
 
 // ===== INIT =====
-// 启动时自动拉取云端数据
+// 启动时先初始化本地数据（确保预置企业存在），再拉取云端
 (async function initSync() {
+  // 先初始化本地数据（确保预置企业存在）
+  getData();
   if (getToken()) {
     setSyncStatus('syncing', '🔄 加载中...');
     try {
