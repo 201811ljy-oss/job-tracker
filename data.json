@@ -1,6 +1,6 @@
 {
   "v": 2,
-  "t": 1786445258977,
+  "t": 1786445315160,
   "data": {
     "zt1": {
       "status": "未投递",
@@ -426,6 +426,14 @@
       "notes": "",
       "_t": 1782382707967
     },
+    "custom_1782380496484": {
+      "status": "已投递",
+      "applyDate": "2026-08-08",
+      "applyChannel": "企业官网",
+      "applyUrl": "",
+      "notes": "",
+      "_t": 1786154632215
+    },
     "custom_1782382707966": {
       "status": "未投递",
       "applyDate": "",
@@ -433,14 +441,6 @@
       "applyUrl": "",
       "notes": "",
       "_t": 1782382707967
-    },
-    "custom_1782380496484": {
-      "status": "未投递",
-      "applyDate": "",
-      "applyChannel": "",
-      "applyUrl": "",
-      "notes": "",
-      "_t": 1782486186425
     },
     "custom_1783308752625": {
       "status": "未投递",
@@ -453,20 +453,20 @@
   },
   "custom": [
     {
-      "id": "custom_1782382707966",
-      "name": "顺丰快递",
-      "tier": "tier4",
-      "custom": true,
-      "positions": "未填写",
-      "location": "未填写",
-      "salary": ""
-    },
-    {
       "id": "custom_1782380496484",
       "name": "京东",
       "tier": "tier4",
       "custom": true,
       "positions": "物流",
+      "location": "未填写",
+      "salary": ""
+    },
+    {
+      "id": "custom_1782382707966",
+      "name": "顺丰快递",
+      "tier": "tier4",
+      "custom": true,
+      "positions": "未填写",
       "location": "未填写",
       "salary": ""
     },
