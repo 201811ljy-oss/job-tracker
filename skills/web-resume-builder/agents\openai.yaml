@@ -1,0 +1,5 @@
+interface:
+  display_name: "网页版简历制作"
+  short_description: "从现有模板或个人经历生成可编辑、可打印的 A4 网页简历"
+  brand_color: "#D40000"
+  default_prompt: "Use $web-resume-builder to create an editable A4 web resume from my existing resume or personal information."
